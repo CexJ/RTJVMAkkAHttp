@@ -1,8 +1,8 @@
-name := "RTJVMAkkaHttp"
+name := "udemy-akka-http"
 
 version := "0.1"
 
-scalaVersion := "2.13.3"
+scalaVersion := "2.12.8"
 
 val akkaVersion = "2.5.20"
 val akkaHttpVersion = "10.1.7"
