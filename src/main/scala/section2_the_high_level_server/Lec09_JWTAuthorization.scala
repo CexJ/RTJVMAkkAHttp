@@ -3,7 +3,6 @@ package section2_the_high_level_server
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import akka.actor.Status.Success
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
@@ -12,6 +11,8 @@ import akka.stream.ActorMaterializer
 import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtSprayJson}
 import section2_the_high_level_server.SecurityDomain.LoginRequest
 import spray.json._
+
+import scala.util.{Failure, Success}
 
 object SecurityDomain extends DefaultJsonProtocol {
   case class LoginRequest(username: String, password: String)
@@ -50,10 +51,11 @@ object Lec09_JWTAuthorization extends App with SprayJsonSupport {
 
 
   def isTokenExpired(token: String): Boolean = JwtSprayJson.decode(token, key, Seq(algorithm)) match {
-    case Success(claim) =>
+    case Success(claims) => claims.expiration.getOrElse(0L) < System.currentTimeMillis() / 1000
+    case Failure(_) => true
   }
 
-  def isTokenValid(token: String): Boolean = ???
+  def isTokenValid(token: String): Boolean = JwtSprayJson.isValid(token, key, Seq(algorithm))
 
   val loginRoute =
   post {
